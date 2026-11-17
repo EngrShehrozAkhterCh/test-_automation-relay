@@ -1,279 +1,1197 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#101827">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1220">
   <title>Smart Home Automation</title>
+
   <style>
-    :root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#18263a;--line:#26364d;--text:#edf3fb;--muted:#91a2b8;--blue:#5aa7ff;--green:#35c98a;--red:#ff6b75;--amber:#f2bd55}
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0%,#152945 0,transparent 34%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .wrap{max-width:1100px;margin:auto;padding:28px 18px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:24px}
-    h1{font-size:clamp(24px,4vw,34px);margin:0;letter-spacing:-.6px}.sub{color:var(--muted);margin-top:5px}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
-    .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block}.dot.ok{background:var(--green)}.dot.bad{background:var(--red)}
-    .card{background:linear-gradient(160deg,rgba(24,38,58,.96),rgba(18,29,46,.96));border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 12px 30px #0002}
-    .login{max-width:430px;margin:60px auto}.login h2,.card h2{margin:0 0 6px;font-size:19px}.muted{color:var(--muted)}label{display:block;color:var(--muted);font-size:13px;margin:14px 0 6px}
-    input{width:100%;padding:12px 13px;background:#0b1422;border:1px solid var(--line);border-radius:9px;color:var(--text);font:inherit;outline:none}input:focus{border-color:var(--blue)}
-    button{border:1px solid #38516e;background:#203650;color:var(--text);padding:10px 14px;border-radius:9px;font:600 14px system-ui;cursor:pointer;transition:.15s}
-    button:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-1px)}button:disabled{opacity:.4;cursor:not-allowed}
-    .primary{background:#1765b5;border-color:#2b83d9}.danger{background:#542a35;border-color:#8c4654}.success{background:#174b3c;border-color:#267b60}
-    .msg{min-height:22px;color:var(--amber);font-size:13px;margin-top:10px;overflow-wrap:anywhere}.hidden{display:none!important}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:18px 0}
-    .metric{background:#0d1726;border:1px solid var(--line);border-radius:12px;padding:15px;min-height:104px}.metric .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.7px}.metric .v{font-size:22px;font-weight:700;margin-top:9px;overflow-wrap:anywhere}.metric .small{font-size:12px;color:var(--muted);margin-top:2px}
-    .sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.section-note{font-size:13px;color:var(--muted);margin:4px 0 0}
-    .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #26364d}.row:last-child{border-bottom:0}.row span:first-child{color:var(--muted)}
-    pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#0a1320;border:1px solid var(--line);border-radius:9px;padding:12px;color:#c8d8eb;font-size:12px;max-height:180px;overflow:auto}
-    .foot{color:var(--muted);font-size:12px;text-align:center;margin-top:22px}
-    @media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sections{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.wrap{padding:20px 13px 40px}}
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #0b1220;
+      color: #e5e7eb;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 1050px;
+      margin: auto;
+    }
+
+    h1 { margin-bottom: 6px; }
+    h2 { font-size: 18px; margin-top: 0; }
+
+    .muted {
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .hidden { display: none !important; }
+
+    .card {
+      background: #111c2e;
+      border: 1px solid #26364e;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: #17243a;
+      border-radius: 10px;
+      padding: 15px;
+      min-width: 0;
+    }
+
+    .metric .value {
+      font-size: 23px;
+      font-weight: bold;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 7px 0 12px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0b1220;
+      color: white;
+    }
+
+    button {
+      padding: 11px 15px;
+      margin: 5px 5px 5px 0;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      background: #2563eb;
+      font-weight: bold;
+    }
+
+    button:hover:not(:disabled) { opacity: .88; }
+
+    button:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+
+    .green { background: #15803d; }
+    .red { background: #b91c1c; }
+    .orange { background: #c2410c; }
+    .gray { background: #475569; }
+
+    .status {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #334155;
+      font-size: 12px;
+    }
+
+    .success { color: #4ade80; }
+    .danger { color: #f87171; }
+    .warning { color: #fbbf24; }
+
+    pre {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      background: #0b1220;
+      padding: 12px;
+      border-radius: 8px;
+      color: #cbd5e1;
+      min-height: 35px;
+      max-height: 250px;
+      overflow: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    label {
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+
+    #message {
+      margin-top: 10px;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .section-note {
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    @media(max-width: 600px) {
+      body { padding: 12px; }
+      .card { padding: 14px; }
+    }
   </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <header class="top">
-      <div><h1>Smart Home Automation</h1><div class="sub">Remote monitoring and control</div></div>
-      <div class="status"><i id="connectionDot" class="dot"></i><span id="connectionText">Not connected</span></div>
-    </header>
+<div class="container">
 
-    <section id="loginCard" class="card login">
-      <h2>Admin sign in</h2>
-      <p class="muted">Sign in with the admin account configured in Firebase Authentication.</p>
-      <form id="loginForm">
-        <label for="email">Email</label><input id="email" type="email" autocomplete="username" required>
-        <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
-        <div class="actions"><button class="primary" id="loginButton" type="submit">Sign in</button></div>
-      </form>
-      <div id="loginMessage" class="msg" role="status"></div>
-    </section>
+  <header class="topbar">
+    <div>
+      <h1>Smart Home Automation</h1>
+      <div class="muted">ESP32 Remote Monitoring and Control</div>
+    </div>
 
-    <section id="dashboard" class="hidden">
-      <div class="top" style="margin-bottom:12px">
-        <div class="muted">Device: <strong style="color:var(--text)">ESP32 Smart Home Controller</strong></div>
-        <button id="logoutButton">Sign out</button>
-      </div>
+    <div id="accountArea" class="hidden">
+      <span id="roleBadge" class="status"></span>
+      <button class="gray" id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <div id="message" role="status"></div>
+
+  <!-- LOGIN -->
+  <section id="loginSection" class="card">
+    <h2>Sign in</h2>
+    <p class="muted">Sign in using your approved Firebase account.</p>
+
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        placeholder="Enter email"
+        required
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Enter password"
+        required
+      >
+
+      <button type="submit" id="loginBtn">Login</button>
+    </form>
+  </section>
+
+  <!-- DASHBOARD -->
+  <main id="dashboard" class="hidden">
+
+    <!-- DEVICE OVERVIEW -->
+    <section class="card">
+      <h2>Live Device Overview</h2>
+
       <div class="grid">
-        <div class="metric"><div class="k">Relay</div><div class="v" id="relayState">—</div><div class="small">Current output state</div></div>
-        <div class="metric"><div class="k">Operating mode</div><div class="v" id="mode">—</div><div class="small">AUTO / MANUAL</div></div>
-        <div class="metric"><div class="k">Distance</div><div class="v" id="distance">—</div><div class="small" id="sensorValidity">Sensor status unknown</div></div>
-        <div class="metric"><div class="k">Wi-Fi signal</div><div class="v" id="rssi">—</div><div class="small" id="deviceIp">IP: —</div></div>
+
+        <div class="metric">
+          <div class="muted">Relay State</div>
+          <div class="value" id="relayState">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="muted">Operating Mode</div>
+          <div class="value" id="mode">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="muted">Distance</div>
+          <div class="value" id="distance">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="muted">Sensor Status</div>
+          <div class="value" id="sensorValid">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="muted">Wi-Fi RSSI</div>
+          <div class="value" id="rssi">--</div>
+        </div>
+
+        <div class="metric">
+          <div class="muted">Device IP</div>
+          <div class="value" id="ip">--</div>
+        </div>
+
       </div>
 
-      <div class="sections">
-        <section class="card">
-          <h2>Device permissions</h2><p class="section-note">Enable permissions before selecting the corresponding operating mode.</p>
-          <div class="actions">
-            <button class="success command" data-command="sensor on">Allow sensor</button>
-            <button class="danger command" data-command="sensor off">Deny sensor</button>
-            <button class="success command" data-command="manual on">Allow manual</button>
-            <button class="danger command" data-command="manual off">Deny manual</button>
-          </div>
-          <div class="row"><span>Sensor permission</span><strong id="sensorPermission">—</strong></div>
-          <div class="row"><span>Manual permission</span><strong id="manualPermission">—</strong></div>
-          <div class="row"><span>Master lockout</span><strong id="lockout">—</strong></div>
-        </section>
-
-        <section class="card">
-          <h2>Operating controls</h2><p class="section-note">Commands are sent through Firebase and executed by the ESP32.</p>
-          <div class="actions">
-            <button class="command" data-command="mode auto">AUTO mode</button>
-            <button class="command" data-command="mode manual">MANUAL mode</button>
-            <button class="success command" data-command="relay on">Relay ON</button>
-            <button class="danger command" data-command="relay off">Relay OFF</button>
-            <button class="danger command" data-command="lock on">Enable master lockout</button>
-            <button class="success command" data-command="lock off">Disable master lockout</button>
-          </div>
-          <div id="commandMessage" class="msg" role="status">Waiting for device data.</div>
-          <div class="row"><span>Threshold</span><strong id="threshold">—</strong></div>
-          <div class="row"><span>Last device update</span><strong id="updatedAt">—</strong></div>
-        </section>
-      </div>
-
-      <section class="card" style="margin-top:16px">
-        <h2>Latest command acknowledgement</h2>
-        <div id="ackSummary" class="muted">No acknowledgement received yet.</div>
-        <pre id="ackRaw">Waiting for acknowledgement…</pre>
-      </section>
-      <div class="foot">Live data is read from Firebase Realtime Database. Control commands require Firebase admin authentication.</div>
+      <p class="muted" id="lastUpdated">Last update: --</p>
     </section>
+
+    <!-- RELAY CONTROL -->
+    <section class="card">
+      <h2>Relay Control</h2>
+
+      <p class="muted" id="relayControlInfo">
+        Relay control availability depends on your account and operating mode.
+      </p>
+
+      <button class="green" id="relayOnBtn">Relay ON</button>
+      <button class="red" id="relayOffBtn">Relay OFF</button>
+    </section>
+
+    <!-- ADMIN ONLY -->
+    <section id="adminSection" class="hidden">
+
+      <!-- ADMIN SETTINGS -->
+      <section class="card">
+        <h2>Admin Device Settings</h2>
+
+        <div class="grid">
+
+          <div class="metric">
+            <div class="muted">Manual Permission</div>
+            <div class="value" id="manualPermission">--</div>
+          </div>
+
+          <div class="metric">
+            <div class="muted">Master Lockout</div>
+            <div class="value" id="masterLockout">--</div>
+          </div>
+
+          <div class="metric">
+            <div class="muted">AUTO Threshold</div>
+            <div class="value" id="threshold">--</div>
+          </div>
+
+        </div>
+
+        <h3>Manual Permission</h3>
+
+        <button class="green" data-command="manual on">
+          Allow Manual
+        </button>
+
+        <button class="red" data-command="manual off">
+          Deny Manual
+        </button>
+
+        <h3>Operating Mode</h3>
+
+        <button data-command="mode auto">
+          AUTO Mode
+        </button>
+
+        <button data-command="mode manual">
+          MANUAL Mode
+        </button>
+
+        <h3>Master Lockout</h3>
+
+        <p class="muted section-note">
+          When lockout is active, normal commands are rejected.
+          Only the administrator can disable lockout.
+        </p>
+
+        <button class="orange" data-command="lock on">
+          Enable Lockout
+        </button>
+
+        <button class="green" data-command="lock off">
+          Disable Lockout
+        </button>
+
+      </section>
+
+      <!-- OPERATOR MANAGEMENT -->
+      <section class="card">
+        <h2>Operator Management</h2>
+
+        <p class="muted">
+          Approve or remove an existing Firebase Authentication user
+          using their Firebase UID.
+        </p>
+
+        <label for="operatorUid">Firebase User UID</label>
+
+        <input
+          id="operatorUid"
+          type="text"
+          placeholder="Enter the user's Firebase UID"
+        >
+
+        <button class="green" id="approveOperatorBtn">
+          Approve Operator
+        </button>
+
+        <button class="red" id="removeOperatorBtn">
+          Remove Operator
+        </button>
+
+        <p class="muted">
+          This changes database permissions. It does not create
+          or delete Firebase Authentication accounts.
+        </p>
+      </section>
+
+      <!-- ADMIN ACKNOWLEDGEMENT -->
+      <section class="card">
+        <h2>Device Acknowledgement</h2>
+        <pre id="ackData">Waiting for device acknowledgement...</pre>
+      </section>
+
+    </section>
+
+    <!-- COMMAND STATUS -->
+    <section class="card">
+      <h2>Command Status</h2>
+      <p class="muted" id="commandStatus">
+        No command sent yet.
+      </p>
+    </section>
+
   </main>
+</div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCBmFSv8HGBl8z4poDeVVXnUNagUGVlyYs",
-      authDomain: "smarthomeautomation-48c86.firebaseapp.com",
-      databaseURL: "https://smarthomeautomation-48c86-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "smarthomeautomation-48c86",
-      storageBucket: "smarthomeautomation-48c86.firebasestorage.app",
-      messagingSenderId: "30852921121",
-      appId: "1:30852921121:web:d531286477e1c1e759b060",
-      measurementId: "G-VB8YTGWMLK"
-    };
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
-    const ADMIN_UID = "94ON3RQmnuTdWJKxLHe2Qq4usK13";
-    const DEVICE_UID = "YChbLUhMLGVlPl0XP22wS9ytjuY2";
-    const DEVICE_PATH = "devices/" + DEVICE_UID;
+<script>
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.database();
+  // ================================================
+  // FIREBASE CONFIGURATION
+  // ================================================
 
-    const $ = id => document.getElementById(id);
-    let telemetryListener = null;
-    let ackListener = null;
-    let pendingCommandId = null;
-    let commandTimeout = null;
+  const firebaseConfig = {
+    apiKey: "AIzaSyCBmFSv8HGBl8z4poDeVVXnUNagUGVlyYs",
+    authDomain: "smarthomeautomation-48c86.firebaseapp.com",
+    databaseURL: "https://smarthomeautomation-48c86-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "smarthomeautomation-48c86",
+    storageBucket: "smarthomeautomation-48c86.firebasestorage.app",
+    messagingSenderId: "30852921121",
+    appId: "1:30852921121:web:d531286477e1c1e759b060"
+  };
 
-    function setConnection(ok, text) {
-      $("connectionDot").className = "dot " + (ok ? "ok" : "bad");
-      $("connectionText").textContent = text;
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  // ================================================
+  // IDENTIFIERS
+  // ================================================
+
+  const ADMIN_UID = "wO04AITuvhS80aLhWIiFQEK2NMu2";
+  const DEVICE_UID = "YChbLUhMLGVlPl0XP22wS9ytjuY2";
+
+  const DEVICE_PATH = "devices/" + DEVICE_UID;
+
+  let currentUser = null;
+  let currentRole = null;
+  let latestMode = null;
+
+  let telemetryListener = null;
+  let adminTelemetryListener = null;
+  let ackListener = null;
+  let accessListener = null;
+
+  let pendingCommandId = null;
+  let commandTimeout = null;
+
+  const el = (id) => document.getElementById(id);
+
+  // ================================================
+  // MESSAGES
+  // ================================================
+
+  function showMessage(message, type = "") {
+    el("message").textContent = message;
+    el("message").className = type;
+  }
+
+  function showCommandStatus(message) {
+    el("commandStatus").textContent = message;
+  }
+
+  // ================================================
+  // LOGIN / DASHBOARD DISPLAY
+  // ================================================
+
+  function showLogin() {
+    el("loginSection").classList.remove("hidden");
+    el("dashboard").classList.add("hidden");
+    el("accountArea").classList.add("hidden");
+  }
+
+  function showDashboard(role) {
+    el("loginSection").classList.add("hidden");
+    el("dashboard").classList.remove("hidden");
+    el("accountArea").classList.remove("hidden");
+
+    el("roleBadge").textContent =
+      role === "admin" ? "ADMIN" : "OPERATOR";
+
+    el("adminSection").classList.toggle(
+      "hidden",
+      role !== "admin"
+    );
+  }
+
+  // ================================================
+  // TIMESTAMP
+  // ================================================
+
+  function formatTimestamp(timestamp) {
+    if (typeof timestamp !== "number") return "--";
+
+    const milliseconds =
+      timestamp < 1000000000000
+        ? timestamp * 1000
+        : timestamp;
+
+    const date = new Date(milliseconds);
+
+    return Number.isNaN(date.getTime())
+      ? "--"
+      : date.toLocaleString();
+  }
+
+  // ================================================
+  // RELAY BUTTON PERMISSIONS
+  // ================================================
+
+  function updateRelayControls(mode) {
+
+    latestMode = mode;
+
+    const operatorCanControl =
+      currentRole === "operator" &&
+      mode === "MANUAL";
+
+    const disableOperator =
+      currentRole === "operator" &&
+      !operatorCanControl;
+
+    el("relayOnBtn").disabled = disableOperator;
+    el("relayOffBtn").disabled = disableOperator;
+
+    if (currentRole === "operator") {
+
+      el("relayControlInfo").textContent =
+        operatorCanControl
+          ? "MANUAL mode active. You can control the relay."
+          : "Operators can control the relay only in MANUAL mode.";
+
+    } else if (currentRole === "admin") {
+
+      el("relayControlInfo").textContent =
+        "Administrator relay controls are available. Firmware safety restrictions still apply.";
+
+    } else {
+
+      el("relayControlInfo").textContent =
+        "Sign in to control the relay.";
     }
-    function showMessage(id, text, color) {
-      $(id).textContent = text;
-      if (color) $(id).style.color = color;
+  }
+
+  // ================================================
+  // BUTTON LOCKING
+  // ================================================
+
+  function setCommandButtonsDisabled(disabled) {
+
+    document.querySelectorAll(
+      "#dashboard button[data-command], #relayOnBtn, #relayOffBtn"
+    ).forEach(button => {
+      button.disabled = disabled;
+    });
+
+    if (!disabled) {
+      updateRelayControls(latestMode);
     }
-    function display(value, suffix = "") {
-      if (value === undefined || value === null || value === "") return "—";
-      return String(value) + suffix;
-    }
-    function yesNo(value) {
-      return value === true ? "ENABLED" : value === false ? "DISABLED" : "—";
-    }
-    function formatTimestamp(value) {
-      if (typeof value !== "number" || !Number.isFinite(value)) return "—";
-      const d = new Date(value * 1000);
-      return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString();
-    }
-    function renderTelemetry(t) {
-      $("relayState").textContent = display(t.relay_state, "").toUpperCase();
-      $("mode").textContent = display(t.mode, "").toUpperCase();
-      $("distance").textContent = t.distance_cm == null ? "—" : Number(t.distance_cm).toFixed(1) + " cm";
-      $("sensorValidity").textContent = t.sensor_valid === true ? "Sensor valid" : "Sensor invalid / unavailable";
-      $("rssi").textContent = t.rssi == null ? "—" : t.rssi + " dBm";
-      $("deviceIp").textContent = "IP: " + display(t.ip);
-      $("sensorPermission").textContent = yesNo(t.sensor_permission);
-      $("manualPermission").textContent = yesNo(t.manual_permission);
-      $("lockout").textContent = t.master_lockout === true ? "ACTIVE" : t.master_lockout === false ? "INACTIVE" : "—";
-      $("threshold").textContent = t.threshold_cm == null ? "—" : t.threshold_cm + " cm";
-      $("updatedAt").textContent = formatTimestamp(t.updated_at);
-    }
-    function detachListeners() {
-      if (telemetryListener) db.ref(DEVICE_PATH + "/telemetry").off("value", telemetryListener);
-      if (ackListener) db.ref(DEVICE_PATH + "/ack").off("value", ackListener);
+  }
+
+  // ================================================
+  // LISTENER CLEANUP
+  // ================================================
+
+  function clearListeners() {
+
+    if (telemetryListener) {
+      db.ref(DEVICE_PATH + "/telemetry")
+        .off("value", telemetryListener);
+
       telemetryListener = null;
+    }
+
+    if (adminTelemetryListener) {
+      db.ref(DEVICE_PATH + "/adminTelemetry")
+        .off("value", adminTelemetryListener);
+
+      adminTelemetryListener = null;
+    }
+
+    if (ackListener) {
+      db.ref(DEVICE_PATH + "/ack")
+        .off("value", ackListener);
+
       ackListener = null;
     }
-    function attachListeners() {
-      detachListeners();
-      const telemetryRef = db.ref(DEVICE_PATH + "/telemetry");
-      telemetryListener = snap => {
-        const data = snap.val();
-        if (data) {
-          renderTelemetry(data);
-          setConnection(true, "Firebase connected · telemetry received");
-        } else {
-          setConnection(true, "Firebase connected · waiting for telemetry");
-        }
-      };
-      telemetryRef.on("value", telemetryListener, error => {
-        setConnection(false, "Telemetry read failed: " + error.message);
-      });
 
-      const ackRef = db.ref(DEVICE_PATH + "/ack");
-      ackListener = snap => {
-        const ack = snap.val();
-        $("ackRaw").textContent = ack ? JSON.stringify(ack, null, 2) : "No acknowledgement received yet.";
-        if (ack) {
-          const id = ack.command_id || "unknown";
-          const status = ack.success === true ? "SUCCESS" : ack.success === false ? "FAILED" : (ack.status || "RECEIVED");
-          $("ackSummary").textContent = "Command ID: " + id + " · Status: " + status;
-          if (pendingCommandId && id === pendingCommandId) {
-            clearTimeout(commandTimeout);
-            pendingCommandId = null;
-            document.querySelectorAll(".command").forEach(b => b.disabled = false);
-            showMessage("commandMessage", "ESP32 acknowledgement received: " + status, status === "SUCCESS" ? "var(--green)" : "var(--amber)");
-          }
-        }
-      };
-      ackRef.on("value", ackListener, error => {
-        $("ackSummary").textContent = "Acknowledgement read failed: " + error.message;
-      });
+    if (accessListener && currentUser) {
+      db.ref("access/" + currentUser.uid + "/role")
+        .off("value", accessListener);
+
+      accessListener = null;
     }
 
-    async function issueCommand(command) {
-      if (!auth.currentUser || auth.currentUser.uid !== ADMIN_UID) {
-        showMessage("commandMessage", "Admin authentication required.", "var(--red)");
-        return;
-      }
-      if (pendingCommandId) {
-        showMessage("commandMessage", "Wait for the previous command acknowledgement.", "var(--amber)");
-        return;
-      }
-      const commandId = (crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2));
-      const payload = {
-        command: command,
-        command_id: commandId,
-        created_at: Math.floor(Date.now() / 1000)
-      };
-      document.querySelectorAll(".command").forEach(b => b.disabled = true);
-      pendingCommandId = commandId;
-      showMessage("commandMessage", "Sending: " + command, "var(--amber)");
-      try {
-        await db.ref(DEVICE_PATH + "/commands").set(payload);
-        commandTimeout = setTimeout(() => {
-          if (pendingCommandId === commandId) {
-            pendingCommandId = null;
-            document.querySelectorAll(".command").forEach(b => b.disabled = false);
-            showMessage("commandMessage", "No matching acknowledgement yet. Check ESP32 Firebase polling and Serial Monitor.", "var(--amber)");
-          }
-        }, 15000);
-      } catch (error) {
-        clearTimeout(commandTimeout);
-        pendingCommandId = null;
-        document.querySelectorAll(".command").forEach(b => b.disabled = false);
-        showMessage("commandMessage", "Command write failed: " + error.message, "var(--red)");
-      }
+    if (commandTimeout) {
+      clearTimeout(commandTimeout);
+      commandTimeout = null;
     }
 
-    $("loginForm").addEventListener("submit", async event => {
-      event.preventDefault();
-      $("loginButton").disabled = true;
-      showMessage("loginMessage", "Signing in…", "var(--amber)");
-      try {
-        const result = await auth.signInWithEmailAndPassword($("email").value.trim(), $("password").value);
-        if (result.user.uid !== ADMIN_UID) {
-          await auth.signOut();
-          throw new Error("This account is not the authorized admin.");
-        }
-        $("password").value = "";
-        showMessage("loginMessage", "");
-      } catch (error) {
-        showMessage("loginMessage", error.message, "var(--red)");
-      } finally {
-        $("loginButton").disabled = false;
-      }
-    });
+    pendingCommandId = null;
+  }
 
-    $("logoutButton").addEventListener("click", () => auth.signOut());
-    document.querySelectorAll(".command").forEach(button => {
-      button.addEventListener("click", () => issueCommand(button.dataset.command));
-    });
+  function clearDashboard() {
 
-    auth.onAuthStateChanged(user => {
-      if (user && user.uid === ADMIN_UID) {
-        $("loginCard").classList.add("hidden");
-        $("dashboard").classList.remove("hidden");
-        setConnection(false, "Connecting to Firebase…");
-        attachListeners();
+    clearListeners();
+
+    currentRole = null;
+    currentUser = null;
+    latestMode = null;
+
+    el("adminSection").classList.add("hidden");
+
+    el("relayState").textContent = "--";
+    el("mode").textContent = "--";
+    el("distance").textContent = "--";
+    el("sensorValid").textContent = "--";
+    el("rssi").textContent = "--";
+    el("ip").textContent = "--";
+    el("lastUpdated").textContent = "Last update: --";
+
+    el("manualPermission").textContent = "--";
+    el("masterLockout").textContent = "--";
+    el("threshold").textContent = "--";
+
+    el("ackData").textContent =
+      "Waiting for device acknowledgement...";
+
+    showCommandStatus("No command sent yet.");
+
+    updateRelayControls(null);
+    showLogin();
+  }
+
+  // ================================================
+  // LOGIN
+  // ================================================
+
+  el("loginForm").addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const email = el("email").value.trim();
+    const password = el("password").value;
+
+    if (!email || !password) {
+      showMessage("Enter your email and password.", "warning");
+      return;
+    }
+
+    el("loginBtn").disabled = true;
+    showMessage("Signing in...");
+
+    try {
+
+      await auth.signInWithEmailAndPassword(email, password);
+
+      el("password").value = "";
+
+    } catch (error) {
+
+      showMessage(
+        "Login failed: " + error.message,
+        "danger"
+      );
+
+    } finally {
+
+      el("loginBtn").disabled = false;
+    }
+  });
+
+  el("logoutBtn").addEventListener("click", async () => {
+    await auth.signOut();
+  });
+
+  // ================================================
+  // AUTHORIZATION
+  // ================================================
+
+  auth.onAuthStateChanged(async (user) => {
+
+    clearListeners();
+
+    if (!user) {
+      clearDashboard();
+      showMessage("Please sign in.");
+      return;
+    }
+
+    currentUser = user;
+    currentRole = null;
+
+    showMessage("Checking account permissions...");
+
+    try {
+
+      if (user.uid === ADMIN_UID) {
+
+        currentRole = "admin";
+
       } else {
-        detachListeners();
-        $("dashboard").classList.add("hidden");
-        $("loginCard").classList.remove("hidden");
-        if (user) auth.signOut();
-        setConnection(false, "Signed out");
+
+        const roleSnapshot = await db
+          .ref("access/" + user.uid + "/role")
+          .once("value");
+
+        if (auth.currentUser?.uid !== user.uid) return;
+
+        if (roleSnapshot.val() !== "operator") {
+
+          await auth.signOut();
+
+          showMessage(
+            "Access denied. Your account is not approved.",
+            "danger"
+          );
+
+          return;
+        }
+
+        currentRole = "operator";
       }
+
+      showDashboard(currentRole);
+
+      attachListeners();
+
+      showMessage(
+        currentRole === "admin"
+          ? "Signed in as administrator."
+          : "Signed in as operator.",
+        "success"
+      );
+
+    } catch (error) {
+
+      console.error("Authorization error:", error);
+
+      await auth.signOut();
+
+      showMessage(
+        "Could not verify account permissions: " + error.message,
+        "danger"
+      );
+    }
+  });
+
+  // ================================================
+  // DATABASE LISTENERS
+  // ================================================
+
+  function attachListeners() {
+
+    clearListeners();
+
+    // --------------------------------
+    // SHARED TELEMETRY
+    // --------------------------------
+
+    const telemetryRef =
+      db.ref(DEVICE_PATH + "/telemetry");
+
+    telemetryListener = (snapshot) => {
+
+      const t = snapshot.val();
+
+      if (!t) {
+        showMessage("Waiting for device telemetry...");
+        updateRelayControls(null);
+        return;
+      }
+
+      el("relayState").textContent =
+        String(t.relay_state ?? "--").toUpperCase();
+
+      el("mode").textContent =
+        String(t.mode ?? "--").toUpperCase();
+
+      el("distance").textContent =
+        t.sensor_valid === true &&
+        typeof t.distance_cm === "number"
+          ? t.distance_cm.toFixed(2) + " cm"
+          : "Unavailable";
+
+      el("sensorValid").textContent =
+        t.sensor_valid === true ? "VALID" :
+        t.sensor_valid === false ? "INVALID" : "--";
+
+      el("rssi").textContent =
+        typeof t.rssi === "number"
+          ? t.rssi + " dBm"
+          : "--";
+
+      el("ip").textContent =
+        t.ip ?? "--";
+
+      el("lastUpdated").textContent =
+        "Last update: " + formatTimestamp(t.updated_at);
+
+      updateRelayControls(t.mode);
+
+    };
+
+    telemetryRef.on(
+      "value",
+      telemetryListener,
+      (error) => {
+        showMessage(
+          "Telemetry access error: " + error.message,
+          "danger"
+        );
+      }
+    );
+
+    // --------------------------------
+    // ADMIN-ONLY TELEMETRY
+    // --------------------------------
+
+    if (currentRole === "admin") {
+
+      const adminRef =
+        db.ref(DEVICE_PATH + "/adminTelemetry");
+
+      adminTelemetryListener = (snapshot) => {
+
+        const t = snapshot.val() || {};
+
+        el("manualPermission").textContent =
+          t.manual_permission === true
+            ? "ENABLED"
+            : t.manual_permission === false
+              ? "DISABLED"
+              : "--";
+
+        el("masterLockout").textContent =
+          t.master_lockout === true
+            ? "ACTIVE"
+            : t.master_lockout === false
+              ? "INACTIVE"
+              : "--";
+
+        el("threshold").textContent =
+          typeof t.threshold_cm === "number"
+            ? t.threshold_cm + " cm"
+            : "--";
+      };
+
+      adminRef.on(
+        "value",
+        adminTelemetryListener,
+        (error) => {
+          showMessage(
+            "Admin telemetry error: " + error.message,
+            "danger"
+          );
+        }
+      );
+
+      // --------------------------------
+      // ADMIN ACKNOWLEDGEMENT
+      // --------------------------------
+
+      const ackRef =
+        db.ref(DEVICE_PATH + "/ack");
+
+      ackListener = (snapshot) => {
+
+        const ack = snapshot.val();
+
+        el("ackData").textContent =
+          ack
+            ? JSON.stringify(ack, null, 2)
+            : "No acknowledgement received yet.";
+
+        if (
+          ack &&
+          pendingCommandId &&
+          ack.command_id === pendingCommandId
+        ) {
+
+          if (commandTimeout) {
+            clearTimeout(commandTimeout);
+            commandTimeout = null;
+          }
+
+          const status =
+            ack.success === true
+              ? "SUCCESS"
+              : ack.success === false
+                ? "FAILED"
+                : ack.status || "RECEIVED";
+
+          pendingCommandId = null;
+
+          setCommandButtonsDisabled(false);
+
+          showCommandStatus(
+            "ESP32 acknowledgement received: " + status
+          );
+        }
+      };
+
+      ackRef.on(
+        "value",
+        ackListener,
+        (error) => {
+          showMessage(
+            "Acknowledgement access error: " + error.message,
+            "danger"
+          );
+        }
+      );
+    }
+
+    // --------------------------------
+    // OPERATOR PERMISSION MONITOR
+    // --------------------------------
+
+    if (currentRole === "operator") {
+
+      const accessRef =
+        db.ref("access/" + currentUser.uid + "/role");
+
+      accessListener = async (snapshot) => {
+
+        if (
+          auth.currentUser &&
+          auth.currentUser.uid === currentUser?.uid &&
+          snapshot.val() !== "operator"
+        ) {
+
+          showMessage(
+            "Your operator access has been revoked.",
+            "danger"
+          );
+
+          await auth.signOut();
+        }
+      };
+
+      accessRef.on(
+        "value",
+        accessListener,
+        async (error) => {
+
+          console.error(
+            "Permission listener error:",
+            error
+          );
+
+          if (
+            auth.currentUser &&
+            auth.currentUser.uid === currentUser?.uid
+          ) {
+            await auth.signOut();
+          }
+        }
+      );
+    }
+  }
+
+  // ================================================
+  // COMMAND SENDING
+  // ================================================
+
+  async function issueCommand(command) {
+
+    if (!currentUser || !currentRole) {
+      showMessage("Please sign in first.", "danger");
+      return;
+    }
+
+    if (pendingCommandId) {
+      showMessage(
+        "Wait for the previous command to finish.",
+        "warning"
+      );
+      return;
+    }
+
+    // Operators may only control relay in MANUAL mode.
+    const operatorAllowed = [
+      "relay on",
+      "relay off"
+    ];
+
+    if (
+      currentRole === "operator" &&
+      !operatorAllowed.includes(command)
+    ) {
+      showMessage(
+        "Operators can only control the relay.",
+        "danger"
+      );
+      return;
+    }
+
+    if (
+      currentRole === "operator" &&
+      latestMode !== "MANUAL"
+    ) {
+      showMessage(
+        "Relay control is available to operators only in MANUAL mode.",
+        "warning"
+      );
+      return;
+    }
+
+    // Only administrator can send administrative commands.
+    if (
+      currentRole !== "admin" &&
+      !operatorAllowed.includes(command)
+    ) {
+      showMessage(
+        "Administrator permission required.",
+        "danger"
+      );
+      return;
+    }
+
+    const commandId =
+      Date.now().toString() + "_" +
+      Math.random().toString(36).slice(2, 8);
+
+    // sender_uid is required by the Firebase Rules.
+    const commandData = {
+      command: command,
+      command_id: commandId,
+      created_at: Math.floor(Date.now() / 1000),
+      sender_uid: currentUser.uid
+    };
+
+    try {
+
+      pendingCommandId = commandId;
+
+      setCommandButtonsDisabled(true);
+
+      showCommandStatus(
+        "Sending command: " + command
+      );
+
+      await db
+        .ref(DEVICE_PATH + "/commands")
+        .set(commandData);
+
+      showCommandStatus(
+        "Command submitted to Firebase. Waiting for ESP32 acknowledgement..."
+      );
+
+      commandTimeout = setTimeout(() => {
+
+        if (pendingCommandId === commandId) {
+
+          pendingCommandId = null;
+
+          setCommandButtonsDisabled(false);
+
+          showCommandStatus(
+            "No matching acknowledgement received. Check ESP32 command polling and Serial Monitor."
+          );
+        }
+
+      }, 15000);
+
+    } catch (error) {
+
+      if (commandTimeout) {
+        clearTimeout(commandTimeout);
+        commandTimeout = null;
+      }
+
+      pendingCommandId = null;
+
+      setCommandButtonsDisabled(false);
+
+      console.error("Firebase command error:", error);
+
+      showCommandStatus(
+        "Command failed: " + error.message
+      );
+
+      showMessage(
+        "Command failed: " + error.message,
+        "danger"
+      );
+    }
+  }
+
+  // ================================================
+  // RELAY BUTTONS
+  // ================================================
+
+  el("relayOnBtn").addEventListener("click", () => {
+    issueCommand("relay on");
+  });
+
+  el("relayOffBtn").addEventListener("click", () => {
+    issueCommand("relay off");
+  });
+
+  // ================================================
+  // ADMIN COMMAND BUTTONS
+  // ================================================
+
+  document.querySelectorAll("[data-command]").forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+      if (currentRole !== "admin") {
+        showMessage(
+          "Administrator permission required.",
+          "danger"
+        );
+        return;
+      }
+
+      issueCommand(button.dataset.command);
     });
-  </script>
+  });
+
+  // ================================================
+  // ADMIN: APPROVE OPERATOR
+  // ================================================
+
+  el("approveOperatorBtn").addEventListener(
+    "click",
+    async () => {
+
+      if (currentRole !== "admin") return;
+
+      const uid = el("operatorUid").value.trim();
+
+      if (!uid) {
+        showMessage(
+          "Enter a Firebase user UID.",
+          "warning"
+        );
+        return;
+      }
+
+      if (uid === ADMIN_UID || uid === DEVICE_UID) {
+        showMessage(
+          "This UID cannot be approved as an operator.",
+          "danger"
+        );
+        return;
+      }
+
+      try {
+
+        await db.ref("access/" + uid).set({
+          role: "operator"
+        });
+
+        showMessage(
+          "Operator approved successfully.",
+          "success"
+        );
+
+        el("operatorUid").value = "";
+
+      } catch (error) {
+
+        console.error("Operator approval error:", error);
+
+        showMessage(
+          "Approval failed: " + error.message,
+          "danger"
+        );
+      }
+    }
+  );
+
+  // ================================================
+  // ADMIN: REMOVE OPERATOR
+  // ================================================
+
+  el("removeOperatorBtn").addEventListener(
+    "click",
+    async () => {
+
+      if (currentRole !== "admin") return;
+
+      const uid = el("operatorUid").value.trim();
+
+      if (!uid) {
+        showMessage(
+          "Enter the operator UID to remove.",
+          "warning"
+        );
+        return;
+      }
+
+      if (uid === ADMIN_UID || uid === DEVICE_UID) {
+        showMessage(
+          "This UID cannot be removed here.",
+          "danger"
+        );
+        return;
+      }
+
+      if (!confirm("Remove operator access for this UID?")) {
+        return;
+      }
+
+      try {
+
+        await db.ref("access/" + uid).remove();
+
+        showMessage(
+          "Operator access removed.",
+          "success"
+        );
+
+        el("operatorUid").value = "";
+
+      } catch (error) {
+
+        console.error("Operator removal error:", error);
+
+        showMessage(
+          "Removal failed: " + error.message,
+          "danger"
+        );
+      }
+    }
+  );
+
+</script>
 </body>
 </html>
